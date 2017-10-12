@@ -7,15 +7,15 @@ class PostsController < ApplicationController
   def create
     @post = Post.new post_params
     if @post.save
-      render json: @post
+      render json: @post, status: 201
     else
-      render json: { errors: @post.errors.full_messages }
+      render json: @post.errors, status:422
     end
   end
 
   private
 
-  def posts_params
-    require(:post).permit(:header, :content, :user_id, :author_ip)
+  def post_params
+    require(:post).permit(:header)
   end
 end
