@@ -16,6 +16,6 @@ class PostsController < ApplicationController
   private
 
   def post_params
-    require(:post).permit(:header)
+    require(:post).permit(:header, :content, :author_ip, :user_id )
   end
 end
