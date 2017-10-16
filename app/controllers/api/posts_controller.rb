@@ -1,12 +1,17 @@
 module Api
   class PostsController < ApplicationController
     def index
-      @posts = Post.order(created_at: :desc)
+      @posts = (params[:top].present? & params[:top].to_i.integer?) ? top_posts.first(params[:top]) : all_posts
       render json: @posts
     end
 
     def create
-      @post = Post.new post_params
+      if params[:login].present?
+        @user = User.find_or_create_by(login: params[:login])
+      else
+        @user = User.create(login: 'noname')
+      end
+      @post = Post.new post_params.merge!(user_id: @user.id)
       if @post.save
         render json: @post, status: 201
       else
@@ -14,24 +19,27 @@ module Api
       end
     end
 
-    def rating
-      @rating = Rating.new(rating_params)
+    def update
+      @rating = Rating.new rating_params
       if @rating.save
         @post = Post.find(@rating.post_id)
         rating = AverageRatingCalc.new(@post).calc
         @post.update_attribute :average_rating, rating
-        render json: @post, status: 201
+        render json: @post.average_rating, status: 201
       else
         render json: @rating.errors[:base], status: 422
       end
     end
 
-    def top_posts
-      max = 5
-      @posts = Post.where(average_rating: max)
+    private
+
+    def all_posts
+      Post.select('posts.id, posts.header, posts.content').order(created_at: :desc)
     end
 
-    private
+    def top_posts
+      Post.select('posts.id, posts.header, posts.content').where.not(average_rating: nil).order(average_rating: :desc)
+    end
 
     def post_params
       params.require(:post).permit( :header, :content, :author_ip, :user_id, :average_rating )

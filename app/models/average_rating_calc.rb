@@ -6,7 +6,7 @@ class AverageRatingCalc
   def calc
     sum = 0
     @post.ratings.each do |rating|
-      sum = sum + rating.rating
+      sum += rating.rating
     end
     sum / @post.ratings.count
   end
