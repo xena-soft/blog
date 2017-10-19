@@ -31,6 +31,11 @@ module Api
       end
     end
 
+    def get_authors
+      @posts = Post.select('posts.author_ip, users.login').joins(:user)
+      render json: @posts
+    end
+
     private
 
     def all_posts
@@ -42,11 +47,11 @@ module Api
     end
 
     def post_params
-      params.require(:post).permit( :header, :content, :author_ip, :user_id, :average_rating )
+      params.require(:post).permit(:header, :content, :author_ip, :user_id, :average_rating)
     end
 
     def rating_params
-      params.require(:rating).permit(:rating, :post_id )
+      params.require(:rating).permit(:rating, :post_id)
     end
   end
 end

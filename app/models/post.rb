@@ -4,5 +4,5 @@ class Post < ApplicationRecord
 
   validates_with Validators::PostValidator
 
-  RATINGS = [ 1, 2, 3, 4, 5 ]
+  RATINGS = [1, 2, 3, 4, 5]
 end
