@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Post, type: :model do
   before do
-    @user = build(:user)
+    @user = create(:user)
   end
 
   it 'is valid with header, content, user_id' do

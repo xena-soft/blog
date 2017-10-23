@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe AverageRatingCalc, type: :model do
 
   before do
-    @user = build(:user)
+    @user = create(:user)
   end
 
   it 'calculates average rating with ratings' do

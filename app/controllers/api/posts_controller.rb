@@ -1,7 +1,7 @@
 module Api
   class PostsController < ApplicationController
     def index
-      @posts = (params[:top].present? & params[:top].to_i.integer?) ? top_posts.first(params[:top]) : all_posts
+      @posts = (params[:top].present? & params[:top].to_i.integer?) ? top_posts : all_posts
       render json: @posts
     end
 
@@ -43,7 +43,7 @@ module Api
     end
 
     def top_posts
-      Post.select('posts.id, posts.header, posts.content').where.not(average_rating: nil).order(average_rating: :desc)
+      Post.select('posts.id, posts.header, posts.content').where.not(average_rating: nil).order(average_rating: :desc).first(params[:top])
     end
 
     def post_params

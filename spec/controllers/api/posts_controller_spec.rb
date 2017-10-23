@@ -4,15 +4,21 @@ RSpec.describe Api::PostsController, type: :controller do
 
   describe 'get#index' do
     before do
-      @post1 = create(:post, average_rating: 1)
-      @post2 = create(:post, average_rating: 2)
-      @post3 = create(:post, average_rating: 3)
+      @user = create(:user)
+      @post1 = create(:post, user_id: @user.id, average_rating: 1)
+      @post2 = create(:post, user_id: @user.id, average_rating: 2)
+      @post3 = create(:post, user_id: @user.id, average_rating: 3)
     end
 
-    # it 'top posts with params[:top]' do
-    #   get :index, top: '2'
-    #   expect(assigns(:posts)).to match_array([@post2, @post3])
-    # end
+    it 'returns http success' do
+      get :index
+      expect(response).to be_success
+    end
+
+    it 'top posts with params[:top]' do
+      get :index, params: {top: 2}
+      expect(assigns(:posts)).to match_array([@post2, @post3])
+    end
 
     it 'all posts without params[:top]' do
       get :index
