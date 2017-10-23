@@ -8,4 +8,12 @@ FactoryGirl.define do
     average_rating nil
   end
 
+  factory :invalid_post, class: 'Post' do
+    header         ''
+    content        ''
+    user_id        nil
+    author_ip      1
+    average_rating nil
+  end
+
 end

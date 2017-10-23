@@ -1,8 +1,10 @@
 FactoryGirl.define do
 
   factory :user do
-    id    1
     login 'max'
   end
 
+  factory :no_login_user, class: 'User' do
+    login 'noname'
+  end
 end
