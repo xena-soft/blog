@@ -33,23 +33,26 @@ RSpec.describe Api::PostsController, type: :controller do
       end
 
       it 'save new post in database' do
-        expect{ post :create, params: { post: attributes_for(:post, user_id: @user.id) } }.to change(Post, :count).by(1)
+        expect{ post :create, params: { post: attributes_for(:post, user_id: @user.id) }, format: :json }.to change(Post, :count).by(1)
+        expect(response).to have_http_status 201
       end
 
       it 'not save post in database' do
-        expect{ post :create, params: { post: attributes_for(:invalid_post) } }.not_to change(Post, :count)
+        expect{ post :create, params: { post: attributes_for(:invalid_post) }, format: :json }.to_not change(Post, :count)
+        expect(response).to have_http_status 422
       end
     end
 
     context 'user without login' do
-      it 'valid post' do
-        @user = create(:no_login_user)
-        expect{ post :create, params: { post: attributes_for(:post, user_id: @user.id) } }.to change(Post, :count).by(1)
+      before { @user = create(:no_login_user) }
+      it 'save new post in database' do
+        expect{ post :create, params: { post: attributes_for(:post, user_id: @user.id) }, format: :json }.to change(Post, :count).by(1)
+        expect(response).to have_http_status 201
       end
 
-      it 'invalid post' do
-        # errors = ['Отсутствует автор', 'Отсутствует заголовок', 'Отсутствует содержание поста']
-        # expect(@post.errors[:base]).to include(errors)
+      it 'not save post in database' do
+        expect{ post :create, params: { post: attributes_for(:invalid_post, user_id: @user.id) }, format: :json }.to_not change(Post, :count)
+        expect(response).to have_http_status 422
       end
     end
   end
@@ -59,9 +62,10 @@ RSpec.describe Api::PostsController, type: :controller do
       @user = create(:user)
       @post = create(:post, user_id: @user.id)
       @rating = create(:rating, post_id: @post.id)
-      patch :update, params: { id: @post, post: attributes_for(:post, average_rating: '2'), rating: attributes_for(:rating) }
+      average_rating = AverageRatingCalc.new(@post).calc
+      patch :update, params: { id: @post, post: attributes_for(:post, average_rating: average_rating), rating: attributes_for(:rating) }
       @post.reload
-      expect(@post.average_rating).to eq('2')
+      expect(@post.average_rating).to eql @post[:average_rating]
     end
   end
 
